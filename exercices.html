@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Étude - Exercices</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Mon Combat</h1>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="cours.html">Cours</a>
+        <a href="exercices.html">Exercices</a>
+        <a href="forum.html">Forum</a>
+        <a href="A propos.html">À propos</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h2>Exercices</h2>
+
+    <fieldset>
+        <legend>Ajouter un Exercice</legend>
+        <input type="text" id="code-acces" placeholder="Code d'accès" required>
+        <button onclick="verifierCode()">Entrer</button>
+        <div id="ajout-exercice" style="display: none;">
+            <input type="text" id="exercice-titre" placeholder="Titre de l'exercice" required>
+            <textarea id="exercice-contenu" placeholder="Contenu de l'exercice" required></textarea>
+            <input type="file" id="exercice-fichiers" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" multiple>
+            <button onclick="ajouterExercice()">Ajouter Exercice</button>
+            <button onclick="retour()">Retour</button>
+            <h3>Liste des Exercices</h3>
+            <ul id="sous-list-exercices"></ul>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Liste des Exercices (non modifiable)</legend>
+        <ul id="list-exercices"></ul>
+    </fieldset>
+</div>
+
+<footer>
+    <p>&copy; 2024 Plateforme d'Étude. Tous droits réservés.</p>
+</footer>
+
+<script>
+    const exercices = []; // Stocker les exercices pour le téléchargement
+
+    function verifierCode() {
+        const code = document.getElementById('code-acces').value;
+        if (code === 'mwise65') {
+            document.getElementById('ajout-exercice').style.display = 'block';
+            document.getElementById('code-acces').value = '';
+        } else {
+            alert('Code d\'accès incorrect !');
+        }
+    }
+
+    function ajouterExercice() {
+        const titre = document.getElementById('exercice-titre').value;
+        const contenu = document.getElementById('exercice-contenu').value;
+        const fichierInput = document.getElementById('exercice-fichiers');
+
+        const exercice = { titre, contenu, fichiers: [] };
+        
+        // Gérer les fichiers
+        if (fichierInput.files.length > 0) {
+            const fileData = [];
+            for (let i = 0; i < fichierInput.files.length; i++) {
+                const fichier = fichierInput.files[i];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    fileData.push({ data: event.target.result, nom: fichier.name });
+                    if (fileData.length === fichierInput.files.length) {
+                        // Ajout de l'exercice après que tous les fichiers aient été lus
+                        exercice.fichiers = fileData;
+                        exercices.push(exercice); // Stocker l'exercice
+                        ajouterExerciceToList(exercice);
+                    }
+                };
+                reader.readAsDataURL(fichier);
+            }
+        } else {
+            // Si aucun fichier n'est téléchargé, ajoute seulement le titre et le contenu
+            exercices.push(exercice); // Stocker l'exercice sans fichiers
+            ajouterExerciceToList(exercice);
+        }
+    }
+
+    function ajouterExerciceToList(exercice) {
+        const sousListExercices = document.getElementById('sous-list-exercices');
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${exercice.titre}</strong>: ${exercice.contenu}`;
+        
+        if (exercice.fichiers.length > 0) {
+            const fichierDiv = document.createElement('div');
+            fichierDiv.className = 'fichiers-container';
+            exercice.fichiers.forEach(fichier => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'fichier-item';
+                fileDiv.innerHTML = `${fichier.nom}`;
+                const downloadButton = document.createElement('button');
+                downloadButton.innerText = 'Télécharger';
+                downloadButton.onclick = function() {
+                    downloadFile(fichier.data, fichier.nom);
+                };
+                fileDiv.appendChild(downloadButton);
+                fichierDiv.appendChild(fileDiv);
+            });
+            li.appendChild(fichierDiv);
+        }
+
+        li.innerHTML += `<button onclick="supprimerExercice(this)">Supprimer</button>`;
+        sousListExercices.appendChild(li);
+
+        // Ajouter l'exercice à la liste principale
+        const listExercices = document.getElementById('list-exercices');
+        const liMain = document.createElement('li');
+        liMain.innerHTML = `<strong>${exercice.titre}</strong>: ${exercice.contenu}`;
+        
+        if (exercice.fichiers.length > 0) {
+            const fichierDiv = document.createElement('div');
+            fichierDiv.className = 'fichiers-container';
+            exercice.fichiers.forEach(fichier => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'fichier-item';
+                fileDiv.innerHTML = `${fichier.nom}`;
+                const downloadButton = document.createElement('button');
+                downloadButton.innerText = 'Télécharger';
+                downloadButton.onclick = function() {
+                    downloadFile(fichier.data, fichier.nom);
+                };
+                fileDiv.appendChild(downloadButton);
+                fichierDiv.appendChild(fileDiv);
+            });
+            liMain.appendChild(fichierDiv);
+        }
+
+        listExercices.appendChild(liMain);
+
+        // Réinitialiser le formulaire
+        resetForm();
+    }
+
+    function downloadFile(data, filename) {
+        const link = document.createElement('a');
+        link.href = data;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function supprimerExercice(button) {
+        const listItem = button.parentNode;
+        listItem.parentNode.removeChild(listItem);
+    }
+
+    function retour() {
+        document.getElementById('ajout-exercice').style.display = 'none'; // Masquer la section d'ajout
+        resetForm(); // Réinitialiser le formulaire
+    }
+
+    function resetForm() {
+        document.getElementById('exercice-titre').value = '';
+        document.getElementById('exercice-contenu').value = '';
+        document.getElementById('exercice-fichiers').value = ''; // Réinitialiser le champ de fichiers
+    }
+</script>
+
+<style>
+    fieldset {
+        border: 2px solid #007BFF;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    legend {
+        font-weight: bold;
+        color: #007BFF;
+    }
+
+    button {
+        margin-left: 10px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .fichiers-container {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #007BFF;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .fichier-item {
+        margin: 5px 0;
+    }
+</style>
+
+</body>
+</html>
