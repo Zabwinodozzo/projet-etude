@@ -7,6 +7,11 @@ body {
     color: #333;
 }
 
+#main-nav{
+    margin-left:2rem;
+    gap:1rem;
+        }
+
 header {
     background: #007BFF;
     color: white;
