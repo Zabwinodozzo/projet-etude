@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Étude - Accueil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Mon Combat</h1>
+    <nav id="main-nav" style="display: none;">
+        <a href="cours.html">Cours</a>
+        <a href="exercices.html">Exercices</a>
+        <a href="forum.html">Forum</a>
+        <a href="A propos.html">À propos</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h2>Bienvenue sur la plateforme d'étude</h2>
+    <p>Veuillez renseigner vos informations pour accéder au contenu.</p>
+    <input type="text" id="nom" placeholder="Votre nom" required>
+    <input type="text" id="prenom" placeholder="Votre prénom" required>
+    <select id="role" required>
+        <option value="" disabled selected>Choisissez votre rôle</option>
+        <option value="professeur">Professeur</option>
+        <option value="étudiant">Étudiant</option>
+    </select>
+    <button onclick="validerInfos()">Valider</button>
+</div>
+
+<footer>
+    <p>&copy; 2024 Plateforme d'Étude. Tous droits réservés.</p>
+</footer>
+
+<script>
+    function validerInfos() {
+        const nom = document.getElementById('nom').value;
+        const prenom = document.getElementById('prenom').value;
+        const role = document.getElementById('role').value;
+
+        if (nom && prenom && role) {
+            document.getElementById('main-nav').style.display = 'block';
+            alert(`Bienvenue, ${prenom} ${nom}!`);
+            resetForm();
+        } else {
+            alert('Veuillez remplir tous les champs.');
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('nom').value = '';
+        document.getElementById('prenom').value = '';
+        document.getElementById('role').selectedIndex = 0; // Reset to the first option
+    }
+</script>
+
+<style>
+    .container {
+        margin: 20px;
+    }
+
+    input, select {
+        display: block;
+        margin: 10px 0;
+        padding: 10px;
+        width: 300px;
+    }
+
+    button {
+        padding: 10px 15px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+</bo
+dy>
+</html>
