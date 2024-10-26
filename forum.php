@@ -56,6 +56,14 @@ $conn->query($sql);
 </head>
 <body>
 
+       <h1>Plateforme d'Étude</h1>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="cours.html">Cours</a>
+        <a href="exercices.html">Exercices</a>
+        <a href="forum.html">Forum</a>
+        <a href="apropos.html">À propos</a>
+    </nav>
 <div id="user-list">
     <h3>Utilisateurs en ligne</h3>
     <div id="online-users"></div>
