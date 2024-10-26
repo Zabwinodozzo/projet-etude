@@ -49,7 +49,7 @@
 </footer>
 
 <script>
-    const messages = [];
+    const messages = JSON.parse(sessionStorage.getItem('messages')) || [];
 
     function verifierCode() {
         const code = document.getElementById('code-acces').value;
@@ -68,6 +68,7 @@
 
         const message = { auteur: 'Prof', texte: commentaire, fichier: fichierData ? URL.createObjectURL(fichierData) : null, nomFichier: fichierData ? fichierData.name : null };
         messages.push(message);
+        sessionStorage.setItem('messages', JSON.stringify(messages));
         afficherMessages();
         resetProfForm();
     }
@@ -79,6 +80,7 @@
 
         const message = { auteur: 'Étudiant', texte: commentaire, fichier: fichierData ? URL.createObjectURL(fichierData) : null, nomFichier: fichierData ? fichierData.name : null };
         messages.push(message);
+        sessionStorage.setItem('messages', JSON.stringify(messages));
         afficherMessages();
         resetEtudiantForm();
     }
@@ -109,6 +111,9 @@
         document.getElementById('etudiant-commentaire').value = '';
         document.getElementById('etudiant-fichier').value = '';
     }
+
+    // Afficher les messages lors du chargement de la page
+    afficherMessages();
 </script>
 
 <style>
