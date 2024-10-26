@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Étude - Forum</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Mon Combat</h1>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="cours.html">Cours</a>
+        <a href="exercices.html">Exercices</a>
+        <a href="forum.html">Forum</a>
+        <a href="A propos.html">À propos</a>
+    </nav>
+</header>
+
+<div class="container">
+    <fieldset>
+        <legend>Prof</legend>
+        <input type="text" id="code-acces" placeholder="Code d'accès" required>
+        <button onclick="verifierCode()">Entrer</button>
+        <div id="prof-section" style="display: none;">
+            <textarea id="prof-commentaire" placeholder="Votre message ici..."></textarea>
+            <input type="file" id="prof-fichier" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png">
+            <button onclick="envoyerProf()">Envoyer</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Étudiants</legend>
+        <div id="etudiants-section">
+            <textarea id="etudiant-commentaire" placeholder="Votre message ici..."></textarea>
+            <input type="file" id="etudiant-fichier" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png">
+            <button onclick="envoyerEtudiant()">Envoyer</button>
+        </div>
+    </fieldset>
+
+    <h3>Messages</h3>
+    <div id="messages-list"></div>
+</div>
+
+<footer>
+    <p>&copy; 2024 Plateforme d'Étude. Tous droits réservés.</p>
+</footer>
+
+<script>
+    const messages = [];
+
+    function verifierCode() {
+        const code = document.getElementById('code-acces').value;
+        if (code === 'mwise65') {
+            document.getElementById('prof-section').style.display = 'block';
+            document.getElementById('code-acces').value = '';
+        } else {
+            alert('Code d\'accès incorrect !');
+        }
+    }
+
+    function envoyerProf() {
+        const commentaire = document.getElementById('prof-commentaire').value;
+        const fichierInput = document.getElementById('prof-fichier');
+        const fichierData = fichierInput.files.length > 0 ? fichierInput.files[0] : null;
+
+        const message = { auteur: 'Prof', texte: commentaire, fichier: fichierData ? URL.createObjectURL(fichierData) : null, nomFichier: fichierData ? fichierData.name : null };
+        messages.push(message);
+        afficherMessages();
+        resetProfForm();
+    }
+
+    function envoyerEtudiant() {
+        const commentaire = document.getElementById('etudiant-commentaire').value;
+        const fichierInput = document.getElementById('etudiant-fichier');
+        const fichierData = fichierInput.files.length > 0 ? fichierInput.files[0] : null;
+
+        const message = { auteur: 'Étudiant', texte: commentaire, fichier: fichierData ? URL.createObjectURL(fichierData) : null, nomFichier: fichierData ? fichierData.name : null };
+        messages.push(message);
+        afficherMessages();
+        resetEtudiantForm();
+    }
+
+    function afficherMessages() {
+        const messagesList = document.getElementById('messages-list');
+        messagesList.innerHTML = '';
+        messages.forEach((message) => {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${message.auteur}:</strong> <p>${message.texte}</p>`;
+            if (message.fichier) {
+                const lien = document.createElement('a');
+                lien.href = message.fichier;
+                lien.download = message.nomFichier;
+                lien.textContent = ' (Télécharger le fichier)';
+                div.appendChild(lien);
+            }
+            messagesList.appendChild(div);
+        });
+    }
+
+    function resetProfForm() {
+        document.getElementById('prof-commentaire').value = '';
+        document.getElementById('prof-fichier').value = '';
+    }
+
+    function resetEtudiantForm() {
+        document.getElementById('etudiant-commentaire').value = '';
+        document.getElementById('etudiant-fichier').value = '';
+    }
+</script>
+
+<style>
+    fieldset {
+        border: 2px solid #007BFF;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    legend {
+        font-weight: bold;
+        color: #007BFF;
+    }
+
+    #messages-list {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #007BFF;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    #messages-list div {
+        margin: 10px 0;
+    }
+</style>
+
+</body>
+</html>
