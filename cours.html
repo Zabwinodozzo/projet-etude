@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Étude - Cours</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Mon Combat </h1>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="cours.html">Cours</a>
+        <a href="exercices.html">Exercices</a>
+        <a href="forum.html">Forum</a>
+        <a href="A propos.html">À propos</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h2>Cours</h2>
+    <ul id="cours-list"></ul>
+    <h3>Ajouter un Cours</h3>
+    <input type="text" id="cours-titre" placeholder="Titre du cours" required>
+    <textarea id="cours-contenu" placeholder="Contenu du cours" required></textarea>
+    <input type="file" id="cours-fichier" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" multiple>
+    <button onclick="ajouterCours()">Ajouter</button>
+</div>
+
+<footer>
+    <p>&copy; 2024 Plateforme d'Étude. Tous droits réservés.</p>
+</footer>
+
+<script>
+    function afficherCours() {
+        const coursList = document.getElementById('cours-list');
+        coursList.innerHTML = '';
+        const cours = JSON.parse(localStorage.getItem('cours')) || [];
+        cours.forEach((coursItem, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${coursItem.titre}</strong>: ${coursItem.contenu}`;
+            if (coursItem.fichiers && coursItem.fichiers.length > 0) {
+                const fichierDiv = document.createElement('div');
+                fichierDiv.className = 'fichiers-container';
+                coursItem.fichiers.forEach((fichier) => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'fichier-item';
+                    fileDiv.innerHTML = `
+                        <span>${fichier.nom}</span>
+                        <button onclick="downloadFile('${fichier.data}', '${fichier.nom}')">Télécharger</button>
+                    `;
+                    fichierDiv.appendChild(fileDiv);
+                });
+                li.appendChild(fichierDiv);
+            }
+            li.innerHTML += `<button onclick="supprimerCours(${index})">Supprimer</button>`;
+            coursList.appendChild(li);
+        });
+    }
+
+    function ajouterCours() {
+        const titre = document.getElementById('cours-titre').value;
+        const contenu = document.getElementById('cours-contenu').value;
+        const fichierInput = document.getElementById('cours-fichier');
+
+        const cours = JSON.parse(localStorage.getItem('cours')) || [];
+        const fichierData = [];
+
+        if (fichierInput.files.length > 0) {
+            const promises = [];
+            for (let i = 0; i < fichierInput.files.length; i++) {
+                const fichier = fichierInput.files[i];
+                const reader = new FileReader();
+                promises.push(new Promise((resolve) => {
+                    reader.onload = function(event) {
+                        fichierData.push({ 
+                            data: event.target.result, 
+                            nom: fichier.name 
+                        });
+                        resolve();
+                    };
+                    reader.readAsDataURL(fichier);
+                }));
+            }
+            Promise.all(promises).then(() => {
+                cours.push({ titre, contenu, fichiers: fichierData });
+                localStorage.setItem('cours', JSON.stringify(cours));
+                afficherCours();
+                resetForm();
+            });
+        } else {
+            // Si aucun fichier n'est téléchargé, ajoute seulement le titre et le contenu
+            cours.push({ titre, contenu, fichiers: [] });
+            localStorage.setItem('cours', JSON.stringify(cours));
+            afficherCours();
+            resetForm();
+        }
+    }
+
+    function downloadFile(data, filename) {
+        const link = document.createElement('a');
+        link.href = data;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function supprimerCours(coursIndex) {
+        const cours = JSON.parse(localStorage.getItem('cours')) || [];
+        cours.splice(coursIndex, 1); // Supprime l'élément entier (titre, contenu, et fichiers)
+        localStorage.setItem('cours', JSON.stringify(cours));
+        afficherCours();
+    }
+
+    function resetForm() {
+        document.getElementById('cours-titre').value = '';
+        document.getElementById('cours-contenu').value = '';
+        document.getElementById('cours-fichier').value = '';
+    }
+
+    // Afficher les cours au chargement
+    window.onload = afficherCours;
+</script>
+
+<style>
+    .fichiers-container {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #007BFF;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .fichier-item {
+        margin: 5px 0;
+    }
+
+    .fichier-item button {
+        margin-left: 10px;
+        background-color: #28a745; /* Couleur du bouton de téléchargement */
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .fichier-item button:hover {
+        background-color: #218838; /* Couleur au survol */
+    }
+
+    button {
+        margin-left: 10px;
+        background-color: #dc3545; /* Couleur du bouton de suppression */
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #c82333; /* Couleur au survol pour le bouton de suppression */
+    }
+</style>
+
+</body>
+</html>
